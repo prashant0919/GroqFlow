@@ -1,0 +1,26 @@
+tenant:
+  id: "school_001"
+  name: "Springfield Elementary"
+  description: "A premier educational institution dedicated to academic excellence and student growth from K-12."
+  ui:
+    primary_hue: "yellow"
+    secondary_hue: "orange"
+    avatar: "🎓"
+  booking:
+    fields:
+      - name: "parent_name"
+        description: "Parent's full name"
+        required: true
+        type: "string"
+      - name: "student_name"
+        description: "Student's full name"
+        required: true
+        type: "string"
+      - name: "grade_level"
+        description: "Student's grade level"
+        required: true
+        type: "string"
+      - name: "email"
+        description: "Parent's contact email"
+        required: true
+        type: "string"

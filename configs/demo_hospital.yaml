@@ -1,0 +1,26 @@
+tenant:
+  id: "hospital_001"
+  name: "City Hospital"
+  description: "A leading healthcare provider specializing in cardiology and general medicine. We are committed to providing the highest quality patient care."
+  ui:
+    primary_hue: "red"
+    secondary_hue: "rose"
+    avatar: "🏥"
+  booking:
+    fields:
+      - name: "patient_name"
+        description: "Patient's full name"
+        required: true
+        type: "string"
+      - name: "dob"
+        description: "Patient's Date of Birth (YYYY-MM-DD)"
+        required: true
+        type: "string"
+      - name: "phone_number"
+        description: "Patient's contact phone number"
+        required: true
+        type: "string"
+      - name: "symptoms"
+        description: "Brief description of symptoms"
+        required: false
+        type: "string"
