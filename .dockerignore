@@ -1,0 +1,43 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Secrets — never bake credentials into the image
+.env
+
+# Git metadata
+.git/
+.gitignore
+
+# Vector DB — rebuilt at runtime from uploaded_documents
+vector_db/
+uploaded_documents/
+
+# MLflow runs — mount a volume if you want persistence
+mlruns/
+data/*.sqlite3
+data/*.sqlite3-shm
+data/*.sqlite3-wal
+data/local_owner_id
+
+# macOS artefacts
+.DS_Store
+
+# IDE / editor
+.vscode/
+.idea/
+.streamlit/secrets.toml
+*.ipynb_checkpoints/
+
+# Docs / build outputs
+*.docx
+*.pdf
+dist/
+build/
