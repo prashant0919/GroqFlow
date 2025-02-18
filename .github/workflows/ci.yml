@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  lint-and-validate:
+    name: Lint & Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Set up Python ─────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      # ── 3. Install dependencies ───────────────────────────────────────────
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      # ── 4. Lint with ruff ─────────────────────────────────────────────────
+      - name: Lint with ruff
+        run: |
+          ruff check . --output-format=github
+
+      - name: Run tests
+        run: pytest -q
+
+      # ── 5. Validate YAML configs ──────────────────────────────────────────
+      - name: Validate YAML configs
+        run: |
+          python - <<'EOF'
+          import yaml, glob, sys
+
+          configs = glob.glob("configs/*.yaml")
+          if not configs:
+              print("No YAML config files found — skipping.")
+              sys.exit(0)
+
+          errors = []
+          for path in configs:
+              try:
+                  with open(path) as f:
+                      data = yaml.safe_load(f)
+                  # Basic sanity: each config must have a 'name' key under 'tenant'
+                  tenant_data = data.get("tenant", {}) if isinstance(data, dict) else {}
+                  if "name" not in tenant_data:
+                      errors.append(f"{path}: missing required 'tenant.name' field")
+                  else:
+                      print(f"✅ {path} — OK (name={tenant_data['name']})")
+              except yaml.YAMLError as exc:
+                  errors.append(f"{path}: YAML parse error — {exc}")
+
+          if errors:
+              for e in errors:
+                  print(f"❌ {e}", file=sys.stderr)
+              sys.exit(1)
+          EOF
+
+      # ── 6. Config loader smoke test ───────────────────────────────────────
+      - name: Config loader smoke test
+        env:
+          TENANT_CONFIG_PATH: configs/demo_hospital.yaml
+          # Dummy key so the import doesn't fail — no real API calls happen
+          GROQ_API_KEY: dummy_key_for_ci
+        run: |
+          python - <<'EOF'
+          import os
+          config_path = os.environ.setdefault("TENANT_CONFIG_PATH", "configs/demo_hospital.yaml")
+          from groqflow.config_loader import load_tenant_config
+          cfg = load_tenant_config(config_path)
+          assert cfg is not None, "Config loader returned None"
+          print(f"✅ Config loaded successfully: {cfg}")
+          EOF
